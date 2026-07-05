@@ -2,7 +2,7 @@ pipeline {
   agent any
 
   parameters {
-    choice(name: 'ACTION', choices: ['plan', 'apply','destroy'], description: 'Choose whether to plan or apply Terraform changes')
+    choice(name: 'ACTION', choices: ['plan', 'apply', 'destroy'], description: 'Choose whether to plan or apply Terraform changes')
     choice(name: 'ENV', choices: ['dev', 'prod'], description: 'Select the Terraform variable file to use')
   }
 
@@ -14,7 +14,6 @@ pipeline {
   }
 
   stages {
-    
     stage('Checkout') {
       steps {
         checkout scm
@@ -64,31 +63,31 @@ pipeline {
       }
     }
 
-        stage('Terraform Destroy Plan') {
-            when {
-                expression { params.ACTION == 'destroy' }
-            }
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir("${TF_DIR}") {
-                        sh "terraform plan -destroy -var-file=terraform.${params.ENV}.tfvars -out=tfplan"
-                    }
-                }
-            }
-        }
+    stage('Terraform Destroy Plan') {
+      when {
+        expression { params.ACTION == 'destroy' }
+      }
+      steps {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+          dir("${TF_DIR}") {
+            sh "terraform plan -destroy -var-file=terraform.${params.ENV}.tfvars -out=tfplan"
+         }
+       }
+      }
+    }
 
-        stage('Terraform Destroy') {
-            when {
-                expression { params.ACTION == 'destroy' }
-            }
-            steps {
-                withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
-                    dir("${TF_DIR}") {
-                        sh 'terraform apply -auto-approve -input=false tfplan'
-                    }
-                }
-            }
+    stage('Terraform Destroy') {
+      when {
+        expression { params.ACTION == 'destroy' }
+      }
+      steps {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-credentials', accessKeyVariable: 'AWS_ACCESS_KEY_ID', secretKeyVariable: 'AWS_SECRET_ACCESS_KEY']]) {
+          dir("${TF_DIR}") {
+            sh 'terraform apply -auto-approve -input=false tfplan'
+          }
         }
+      }
+    }
   }
 
   post {
