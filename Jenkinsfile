@@ -10,6 +10,7 @@ pipeline {
     TF_DIR = 'ec2'
     AWS_DEFAULT_REGION = 'ap-south-2'
     TF_IN_AUTOMATION = 'true'
+    TF_CLI_ARGS = '-no-color'
   }
 
   stages {
