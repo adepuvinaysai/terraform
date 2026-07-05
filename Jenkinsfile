@@ -7,7 +7,7 @@ pipeline {
   }
 
   environment {
-    TF_DIR = 'terraform-ec2'
+    TF_DIR = 'ec2'
     AWS_DEFAULT_REGION = 'ap-south-2'
     TF_IN_AUTOMATION = 'true'
   }
